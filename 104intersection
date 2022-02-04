@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2020
+## 104intersection.c
+## File description:
+## intersection
+##
+
+import math
+import sys
+from argparse import ArgumentParser, ArgumentTypeError
+
+def args_parser(args):
+  argsParse = ArgumentParser()
+
+  argsParse.add_argument("opt", type = int, choices = (1, 2, 3), help = "Error, 1 or 2 or 3")
+  argsParse.add_argument("xp", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("yp", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("zp", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("xv", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("yv", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("zv", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("p", type = int, choices=range(1,180), help = "Error, try using a valid one")
+
+  try:
+    arguments = argsParse.parse_args(args)
+  except SystemExit:
+    return sys.exit(84)
+
+  return arguments
+
+def get_inter_cone(xp, yp, zp, xv, yv, zv, a, b, c):
+  if a == 0 :
+    if b == 0 :
+      print("Line passing through the point (",xp,", ",yp,", ",zp,") and parallel to the vector (",xv,", ",yv,", ",argszv,")", sep="")
+      if c == 0 :
+        print("There is an infinite number of intersection points.")
+        sys.exit(0)
+      else :
+        print("No intersection point.")
+        sys.exit(0)
+    else :
+      calcul1 = -c / b
+      print("Line passing through the point (",xp,", ",yp,", ",zp,") and parallel to the vector (",xv,", ",yv,", ",zv,")", sep="")
+      print("1 intersection point :")
+      xi = xp + calcul1 * xv
+      yi = yp + calcul1 * yv
+      zi = zp + calcul1 * zv
+      print("(%.3f"%xi,", %.3f"%yi,", %.3f"%zi,")",sep="")
+      sys.exit(0)
+  return 0
+
+def get_inter_point(opt, xp, yp, zp, xv, yv, zv, a, b, c):
+
+  print("Line passing through the point (",xp,", ",yp,", ",zp,") and parallel to the vector (",xv,", ",yv,", ",zv,")", sep="")
+  delta = math.pow(b,2) - 4 * a * c
+
+  if delta < 0 :
+    print("No intersection point.")
+    return 0
+
+  if delta == 0 :
+    print("1 intersection point:")
+    if (a == 0):
+      calcul = -b
+    else:
+      calcul = -b/(2 * a)
+    x1 = xp + calcul * xv
+    y1 = yp + calcul * yv
+    z1 = zp + calcul * zv
+    print("(%.3f"%x1,", %.3f"%y1,", %.3f"%z1,")",sep="")
+    return 0
+
+  if delta > 0 :
+    print("2 intersection points:")
+    calcul1 = ((-b - math.sqrt(delta))/(2 * a))
+    calcul2 = ((-b + math.sqrt(delta))/(2 * a))
+    x1a = xp + calcul1 * xv
+    y1a = yp + calcul1 * yv
+    z1a = zp + calcul1 * zv
+    x2a = xp + calcul2 * xv
+    y2a = yp + calcul2 * yv
+    z2a = zp + calcul2 * zv
+    if opt != 3:
+      if calcul1 > calcul2 :
+        print("(%.3f"%x1a,", %.3f"%y1a,", %.3f"%z1a,")",sep="")
+        print("(%.3f"%x2a,", %.3f"%y2a,", %.3f"%z2a,")",sep="")
+      else :
+        print("(%.3f"%x2a,", %.3f"%y2a,", %.3f"%z2a,")",sep="")
+        print("(%.3f"%x1a,", %.3f"%y1a,", %.3f"%z1a,")",sep="")
+      return 0
+    else:
+      if calcul1 < calcul2 :
+        print("(%.3f"%x1a,", %.3f"%y1a,", %.3f"%z1a,")",sep="")
+        print("(%.3f"%x2a,", %.3f"%y2a,", %.3f"%z2a,")",sep="")
+      else :
+        print("(%.3f"%x2a,", %.3f"%y2a,", %.3f"%z2a,")",sep="")
+        print("(%.3f"%x1a,", %.3f"%y1a,", %.3f"%z1a,")",sep="")
+      return 0
+
+def get_inter_cyl(xp, yp, zp, xv, yv, zv, a, c):
+  if a == 0 :
+    if zv == 0 :
+      sys.exit(84)
+    else :
+      if c == 0 :
+        print("Line passing through the point (",xp,", ",yp,", ",zp,") and parallel to the vector (",xv,", ",yv,", ",zv,")", sep="")
+        print("There is an infinite number of intersection points.")
+        sys.exit(0)
+      else:
+        print("Line passing through the point (",xp,", ",yp,", ",zp,") and parallel to the vector (",xv,", ",yv,", ",zv,")", sep="")
+        print("No intersection point.")
+        sys.exit(0)
+
+
+def main() :
+  a = 0
+  b = 0
+  c = 0
+  args = args_parser(sys.argv[1:])
+
+  if (int(sys.argv[8]) == 95):
+    sys.exit(84)
+  if (len(sys.argv) > 9):
+    sys.exit(84)
+  if (int(sys.argv[8]) <= 0):
+    sys.exit(84)
+
+  try :
+    opt = int(sys.argv[1])
+    xp = int(sys.argv[2])
+    yp = int(sys.argv[3])
+    zp = int(sys.argv[4])
+    xv = int(sys.argv[5])
+    yv = int(sys.argv[6])
+    zv = int(sys.argv[7])
+    p = int(sys.argv[8])
+
+  except ValueError :
+    sys.exit(84)
+
+  if opt == 1 :
+    print("Sphere of radius", p)
+    a = math.pow(xv,2) + math.pow(yv,2) + math.pow(zv,2)
+    b = 2 * xp * xv + 2 * yp * yv + 2 * zp * zv
+    c = math.pow(xp,2) + math.pow(yp,2) + math.pow(zp,2) - math.pow(p,2)
+    if (a == 0):
+      sys.exit(84)
+
+  elif opt == 2 :
+    print("Cylinder of radius", p)
+    a = math.pow(xv,2) + math.pow(yv,2)
+    b = 2 * xp * xv + 2 * yp * yv
+    c = math.pow(xp,2) + math.pow(yp,2) - math.pow(p,2)
+    get_inter_cyl(xp, yp, zp, xv, yv, zv, a, c)
+
+  elif opt == 3 :
+    print("Cone with a",p, "degree angle")
+    p = math.radians(p)
+    a = math.pow(xv,2) + math.pow(yv,2) - math.pow((zv * math.tan(p)), 2)
+    b = 2 * xp * xv + 2 * yp * yv - 2 * zp * zv * math.pow(math.tan(p), 2)
+    c = math.pow(xp,2) + math.pow(yp,2) - math.pow(zp,2) * math.pow(math.tan(p),2)
+    get_inter_cone(xp, yp, zp, xv, yv, zv, a, b, c)
+
+  get_inter_point(opt, xp, yp, zp, xv, yv, zv, a, b, c)
+  return 0
+main()

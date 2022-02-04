@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2020
+## 105torus.c
+## File description:
+## torus
+##
+
+import math
+import sys
+from argparse import ArgumentParser, ArgumentTypeError
+
+def args_parser(args):
+  argsParse = ArgumentParser()
+
+  argsParse.add_argument("opt", type = int, choices = (1, 2, 3), help = "Error, 1 or 2 or 3")
+  argsParse.add_argument("a0", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("a1", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("a2", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("a3", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("a4", type = int, help = "Error, try using a valid one")
+  argsParse.add_argument("n", type = int, help = "Error, try using a valid one")
+
+  try:
+    arguments = argsParse.parse_args(args)
+  except SystemExit:
+    return sys.exit(84)
+
+  return arguments
+
+def function_4_degree(a0, a1, a2, a3, a4, nb):
+  return ((a4 * pow(nb,4)) + (a3 * pow(nb,3)) + (a2 * pow(nb,2)) + (a1 * nb) + a0)
+
+def second_function(a1, a2, a3, a4, nb):
+  return ((4 * (a4 * pow(nb,3))) + (3 * (a3 * pow(nb,2))) + (2 * (a2 * nb)) + a1)
+
+def check_error(second, first, bool):
+  if (bool == 1):
+    if (second == 0):
+      sys.stderr.write("Division by zero\n")
+      sys.exit(84)
+  elif (bool == 2):
+    if ((second - first) == 0):
+      sys.stderr.write("Division by zero\n")
+      sys.exit(84)
+  else:
+    return 0
+
+def newton_meth(a0, a1, a2, a3, a4, prec, nb):
+  i = 1
+
+  print("x = %g" % nb)
+  while (i < 150):
+    first = function_4_degree(a0, a1, a2, a3, a4, nb)
+    second = second_function(a1, a2, a3, a4, nb)
+    check_error(second, first, 1)
+    x = nb - (first / second)
+    if (round(nb * pow(10, prec)) == round(x * pow(10, prec))):
+      return(0)
+    if (i <= 5):
+      print("x = %.*g" % (prec,x))
+    else :
+      print("x = %.*f" % (prec,x))
+    nb = x
+    i += 1
+
+def solve_this(args, x):
+  result = args.a4 * (math.pow(x, 4))
+  result += args.a3 * (math.pow(x, 3))
+  result += args.a2 * (math.pow(x, 2))
+  result += args.a1 * x
+  result += args.a0
+
+  return result
+
+def bisection_meth(args, a, b, prec):
+  c = (a + b) / 2
+  rounder = round(c, prec)
+
+  if (solve_this(args, a) * solve_this(args, b) >= 0):
+    sys.stderr.write("bisection method will not work\n")
+    sys.exit(84)
+  print("x =", rounder)
+  if (abs(solve_this(args, c)) <= math.pow(10, -prec)):
+    return 0
+  else:
+    if ((solve_this(args, a) * solve_this(args, c)) < 0):
+      bisection_meth(args, a, c, prec)
+    else:
+      bisection_meth(args, c, b, prec)
+
+
+def secant_meth(args, a, b, prec):
+  result = (solve_this(args, b) - solve_this(args, a))
+  if result == 0:
+      sys.stderr.write("Division by zero\n")
+      sys.exit(84)
+  c = b - solve_this(args, b) * (b - a) / result
+  rounder = round(c, prec)
+
+  print("x =", rounder)
+  if (abs(solve_this(args, c)) <= math.pow(10, -prec)):
+    return 0
+  else:
+    secant_meth(args, b, c, prec)
+
+
+def main() :
+  args = args_parser(sys.argv[1:])
+  if (args.n < 0):
+    sys.exit(84)
+  if (len(sys.argv) > 8):
+    sys.exit(84)
+
+  if args.opt == 1 :
+    bisection_meth(args, 0 , 1, args.n)
+  elif args.opt == 2 :
+    newton_meth(args.a0, args.a1, args.a2, args.a3, args.a4, args.n, 0.5)
+  elif args.opt == 3 :
+    secant_meth(args, 0, 1, args.n)
+  return 0
+main()

@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2020
+## 102architect
+## File description:
+## architect
+##
+
+import math
+import sys
+from argparse import ArgumentParser, ArgumentTypeError
+
+def Matrice():
+  M = [ [1.00, 0.00, 0.00],
+        [0.00, 1.00, 0.00],
+        [0.00, 0.00, 1.00] ]
+  return (M)
+
+def Matrice_t(i, j):
+  M2 = [ [1.00, 0.00, i],
+         [0.00, 1.00, j],
+         [0.00, 0.00, 1.00] ]
+  return (M2)
+
+
+def Matrice_z(m, n):
+  M3 = [ [m, 0.00, 0.00],
+         [0.00, n, 0.00],
+         [0.00, 0.00, 1.00] ]
+  return (M3)
+
+def Matrice_r(angle):
+  rad = math.radians(angle)
+  M4 = [ [math.cos(rad), -math.sin(rad), 0.00],
+         [math.sin(rad), math.cos(rad), 0.00],
+         [0.00, 0.00, 1.00] ]
+  return (M4)
+
+def Matrice_s(angle):
+  rad = math.radians(angle)
+  M5 = [ [math.cos(2*rad), math.sin(2*rad), 0.00],
+         [math.sin(2*rad), -math.cos(2*rad), 0.00],
+         [0.00, 0.00, 1.00] ]
+  return (M5)
+
+def args_parser(args):
+  argsParse = ArgumentParser()
+
+  argsParse.add_argument("-t", type=int, nargs=2, help="enter a valid arg")
+  argsParse.add_argument("-z", type=int, nargs=2, help="enter a valid arg")
+  argsParse.add_argument("-r", type=int, nargs=1, help="enter a valid arg")
+  argsParse.add_argument("-s", type=int, nargs=1, help="enter a valid arg")
+
+  try:
+    arguments = argsParse.parse_args(args)
+  except SystemExit:
+    return sys.exit(84)
+  return arguments
+
+def Translation(i, j):
+  print("Translation along vector (" + str(i) + ', ' + str(j) + ")")
+
+def Scaling(i, j):
+  print("Scaling by factors " + str(i) + ' and ' + str(j))
+
+def Rotating(i):
+  print("Rotation by a " + str(i) + ' degree angle')
+
+def Reflexion(i):
+  print("Reflection over an axis with an inclination angle of " + str(i) + ' degrees')
+
+def Multiplication_matrice(M_1, M_2) :
+
+  n=len(M_1)
+  m=len(M_2[0])
+  p=len(M_2)
+
+  C = [[0]*m for i in range(n)]
+
+  for i in range(n):
+    for j in range(m):
+      for k in range(p):
+        C[i][j] += M_1[i][k] * M_2[k][j]
+  return (C)
+
+def check_zero_neg(matrice):
+  if (matrice[0][1]) >= -0.001 and (matrice[0][1]) <= 0.001:
+    matrice[0][1] = 0
+  if (matrice[0][0]) >= -0.001 and (matrice[0][0]) <= 0.001:
+    matrice[0][0] = 0
+  if (matrice[0][2]) >= -0.001 and (matrice[0][2]) <= 0.001:
+    matrice[0][2] = 0
+  if (matrice[1][1]) >= -0.001 and (matrice[1][1]) <= 0.001:
+    matrice[1][1] = 0
+  if (matrice[1][0]) >= -0.001 and (matrice[1][0]) <= 0.001:
+    matrice[1][0] = 0
+  if (matrice[1][2]) >= -0.001 and (matrice[1][2]) <= 0.001:
+    matrice[1][2] = 0
+  return matrice
+
+def main():
+  matrice = Matrice()
+  args_parser(sys.argv[3:])
+
+  if (len(sys.argv) < 5):
+    return sys.exit(84)
+  try:
+    int(sys.argv[1])
+    int(sys.argv[2])
+  except ValueError:
+    return sys.exit(84)
+
+  x = sys.argv[1]
+  y = sys.argv[2]
+  result = x
+  result_2 = y
+  i = len(sys.argv) - 1
+
+  while i > 2 :
+    if sys.argv[i] == "-z" :
+      matrice = Multiplication_matrice(matrice, Matrice_z(float(sys.argv[i + 1]), float(sys.argv[i + 2])))
+    if sys.argv[i] == "-t" :
+      matrice = Multiplication_matrice(matrice, Matrice_t(float(sys.argv[i + 1]), float(sys.argv[i + 2])))
+    if sys.argv[i] == "-r" :
+      matrice = Multiplication_matrice(matrice, Matrice_r(int(sys.argv[i + 1])))
+    if sys.argv[i] == "-s" :
+      matrice = Multiplication_matrice(matrice, Matrice_s(float(sys.argv[i + 1])))
+    result = matrice[0][0] * int(x) + matrice[0][1] * int(y) + matrice[0][2]
+    result_2 = matrice[1][0] * int(x) + matrice[1][1] * int(y) + matrice[1][2]
+    i -= 1
+
+  for i in range(len(sys.argv)) :
+    if sys.argv[i] == "-t" :
+      Translation(sys.argv[i + 1], sys.argv[i + 2])
+    if sys.argv[i] == "-z" :
+      Scaling(sys.argv[i + 1], sys.argv[i + 2])
+    if sys.argv[i] == "-r" :
+      Rotating(sys.argv[i + 1])
+    if sys.argv[i] == "-s" :
+      Reflexion(sys.argv[i + 1])
+
+  matrice = check_zero_neg(matrice)
+  print("%.2f" % matrice[0][0],"\t","%.2f" % matrice[0][1],"\t","%.2f" % matrice[0][2])
+  print("%.2f" % matrice[1][0],"\t","%.2f" % matrice[1][1],"\t","%.2f" % matrice[1][2])
+  print("%.2f" % matrice[2][0],"\t","%.2f" % matrice[2][1],"\t","%.2f" % matrice[2][2])
+  print(end='(')
+  print("%.2f" % float(sys.argv[1]),end=", ")
+  print("%.2f" % float(sys.argv[2]),end=") => (")
+  print("%.2f" % float(result),end=", ")
+  print("%.2f" % float(result_2),end=')\n')
+main()

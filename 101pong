@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2020
+## 101pong
+## File description:
+## pong game simulator
+##
+
+import math
+import numpy as np
+import sys
+
+# change from radians to degrees
+def deg(nb):
+  return (nb*(180/math.pi))
+
+def rad(nb):
+  return (nb*(math.pi/180))
+
+# get velocity of the ball
+def velocity_vector(v1, v2):
+  return (["%.2f" % float(x - y) for x, y in zip(v2, v1)])
+
+# get coordinates after n time
+def n_coordinate(v1, v2, n):
+  return (["%.2f" % float(((x - y)*n) + x) for x, y in zip(v2, v1)])
+
+# calculate angle
+def get_angle(v_vector, n_vector):
+  angle_rad = math.acos(float(v_vector[2])/(math.sqrt(sum(pow(float(v_vector[x]), 2) for x in range(3)))))
+  angle = math.fabs(180 * (angle_rad - math.pi/2)/math.pi)
+  return ("%.2f" % angle)
+
+#dif vector
+def diff_vector(v1, v2):
+  i = 0
+  v3 = []
+  for val in v1:
+    v3.append(val - v2[i])
+    i += 1
+    return (v3)
+
+def main():
+  if len(sys.argv) != 8:
+    sys.exit(84)
+  if (int(sys.argv[7]) < 0):
+    sys.exit(84)
+
+  try:
+    vector = []
+    for i in range(len(sys.argv) - 1):
+      vector.append(float(sys.argv[i + 1]))
+  except:
+    sys.exit(84)
+
+  n = int(vector[-1])
+  v1 = vector[:3]
+  v2 = vector[3:-1]
+  z1 = int(sys.argv[3])
+  z2 = int(sys.argv[6])
+
+  if (n < 0):
+    sys.exit(84)
+
+  v_vector = velocity_vector(v1, v2)
+  n_vector = n_coordinate(v1, v2, n)
+  angle = get_angle(v_vector, n_vector)
+  diff = float(v_vector[2])
+
+  print('The velocity vector of the ball is:')
+  print(end='(')
+  for x in range(len(v_vector)):
+    print(v_vector[x], end='')
+    if x != len(v_vector) - 1:
+      print(end=", ")
+  print(')')
+  print('At time t + ' + str(n) + ', ball coordinates will be:')
+  print(end='(')
+  for x in range(len(n_vector)):
+    print(n_vector[x], end='')
+    if x != len(n_vector) - 1:
+      print(end=", ")
+  print(')')
+  if (angle == 0):
+    sys.exit(84)
+
+  if ((z2 >= 0 and diff < 0) or (z2 <= 0 and diff > 0)):
+    print('The incidence angle is:')
+    print(angle, "degrees")
+  else:
+    print("The ball won't reach the paddle.")
+
+if __name__=="__main__":
+  main()
+  sys.exit(0)

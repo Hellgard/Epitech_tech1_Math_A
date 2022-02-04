@@ -1,0 +1,184 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2020
+## 103cipher
+## File description:
+## cipher
+##
+
+from math import *
+import sys
+from argparse import ArgumentParser, ArgumentTypeError
+
+def Multiplication_matrice(M_1, M_2) :
+
+  n=len(M_1)
+  m=len(M_2[0])
+  p=len(M_2)
+
+  C = [[0]*m for i in range(n)]
+
+  for i in range(n):
+    for j in range(m):
+      for k in range(p):
+         C[i][j] += M_1[i][k] * M_2[k][j]
+  return (C)
+
+
+def Matrix_create(lenght, height, str):
+  matrix = []
+  for i in range(height):
+    matrix_lines = []
+    for n in range(lenght):
+      if (lenght * i + n < len(str)):
+        matrix_lines.append(ord(str[lenght * i + n]))
+      else:
+        matrix_lines.append(0)
+    matrix.append(matrix_lines)
+  return matrix
+
+def args_parser(args):
+  argsParse = ArgumentParser()
+
+  argsParse.add_argument("Message", type = list, help = "Error, try using a valid message")
+  argsParse.add_argument("Key", type = str, help = "Error, try using a valid key")
+  argsParse.add_argument("Flag", type = int, choices = (0, 1), help = "Error, 0 or 1")
+
+  try:
+    arguments = argsParse.parse_args(args)
+  except SystemExit:
+    return sys.exit(84)
+
+  return arguments
+
+def comatrix(matrix):
+
+  m = len(matrix[0])
+  n = len(matrix)
+  cofactor = [[0]*m for i in range(n)]
+
+  cofactor[0][0] = (matrix[1][1] * matrix[2][2]) - (matrix[1][2] * matrix[2][1])
+  cofactor[0][1] = -((matrix[1][0] * matrix[2][2]) - (matrix[1][2] * matrix[2][0]))
+  cofactor[0][2] = (matrix[1][0] * matrix[2][1]) - (matrix[1][1] * matrix[2][0])
+  cofactor[1][0] = -((matrix[0][1] * matrix[2][2]) - (matrix[0][2] * matrix[2][1]))
+  cofactor[1][1] = (matrix[0][0] * matrix[2][2]) - (matrix[0][2] * matrix[2][0])
+  cofactor[1][2] = -((matrix[0][0] * matrix[2][1]) - (matrix[0][1] * matrix[2][0]))
+  cofactor[2][0] = (matrix[0][1] * matrix[1][2]) - (matrix[0][2] * matrix[1][1])
+  cofactor[2][1] = -((matrix[0][0] * matrix[1][2]) - (matrix[0][2] * matrix[1][0]))
+  cofactor[2][2] = (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0])
+  return cofactor
+
+def adj(matrix):
+  m = len(matrix[0])
+  n = len(matrix)
+  transpose = [[0]*m for i in range(n)]
+
+  transpose[0][0] = (matrix[1][1] * matrix[2][2]) - (matrix[1][2] * matrix[2][1])
+  transpose[0][1] = -((matrix[0][1] * matrix[2][2]) - (matrix[0][2] * matrix[2][1]))
+  transpose[0][2] = (matrix[0][1] * matrix[1][2]) - (matrix[0][2] * matrix[1][1])
+  transpose[1][0] = -((matrix[1][0] * matrix[2][2]) - (matrix[1][2] * matrix[2][0]))
+  transpose[1][1] = (matrix[0][0] * matrix[2][2]) - (matrix[0][2] * matrix[2][0])
+  transpose[1][2] = -((matrix[0][0] * matrix[1][2]) - (matrix[0][2] * matrix[1][0]))
+  transpose[2][0] = (matrix[1][0] * matrix[2][1]) - (matrix[1][1] * matrix[2][0])
+  transpose[2][1] = -((matrix[0][0] * matrix[2][1]) - (matrix[0][1] * matrix[2][0]))
+  transpose[2][2] = (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0])
+  return transpose
+
+def get_determinant(matrix, cofactor):
+  determinant = (matrix[0][0] * cofactor[0][0]) + (matrix[0][1] * cofactor[0][1]) + (matrix[0][2] * cofactor[0][2])
+  return determinant
+
+def get_matrix_inversed(matrix, cofactor):
+  n=len(matrix)
+  m=len(cofactor[0])
+  p=len(matrix[0])
+  size = len(matrix)
+  adjugate = adj(matrix)
+  C = [[0]*m for i in range(n)]
+
+  if get_determinant(matrix, comatrix(matrix)) == 0:
+    return sys.exit(84)
+  if size == 1:
+    C = [[1 / get_determinant(matrix, comatrix(matrix))]]
+  elif size == 2:
+    C = [[matrix[1][1] / get_determinant(matrix, comatrix(matrix)), -(matrix[0][1] / get_determinant(matrix, comatrix(matrix)))],
+         [-(matrix[1][0] / get_determinant(matrix, comatrix(matrix))), matrix[0][0] / get_determinant(matrix, comatrix(matrix))]]
+  else :
+      for i in range(n):
+         for k in range(p):
+             C[i][k] += (round(((1 / get_determinant(matrix, comatrix(matrix))) * adjugate[i][k]), 10))
+
+  return (C)
+
+def fill_message_matrix(lenght, height, str):
+  k =0
+  matrix = [[0] * lenght for m in range(ceil(len(str) / 3))]
+
+  for i in range(height):
+    for j in range(lenght):
+      if (k < len(str)):
+          matrix[i][j] = (int(str[k]))
+      k+= 1
+  return matrix
+
+def main():
+  i = 0
+  args = args_parser(sys.argv[1:])
+  string = ""
+  key = ""
+  space = "\t"
+  result = 0
+
+  if (len(args.Key) <= 0):
+    sys.exit(84)
+  lenght = ceil(sqrt(len(args.Key)))
+  height = ceil(len(args.Message) / lenght)
+  if (args.Flag == 0):
+    my_key = Matrix_create(lenght, lenght, args.Key)
+    my_Message = Matrix_create(lenght, height, args.Message)
+    matrice = Multiplication_matrice(my_Message, my_key)
+    print("Key matrix:")
+    for i in range(len(my_key)):
+      n = 0
+      for n in range(len(my_key[i]) - 1):
+        key += (str(my_key[i][n]))
+        key += "\t"
+        n += 1
+      key += (str(my_key[i][n]))
+      key += "\n"
+      i += 1
+    print(str(key))
+    print("Encrypted message:")
+    for i in range(len(matrice)):
+      for n in range(len(matrice[i])):
+        string += (str(matrice[i][n]))
+        string += " "
+        n += 1
+      i += 1
+    print(str(string[:-1]))
+  else:
+    my_key = Matrix_create(lenght, lenght, args.Key)
+    my_key = get_matrix_inversed(my_key, comatrix(my_key))
+    my_Message = fill_message_matrix(lenght, height, sys.argv[1].split(" "))
+    matrice = Multiplication_matrice(my_Message, my_key)
+    print("Key matrix:")
+    for i in range(len(my_key)):
+      for n in range(len(my_key[i]) - 1):
+        key += (str(round(my_key[i][n], 3)))
+        key += "\t"
+        n += 1
+      key += (str(round(my_key[i][n], 3)))
+      key += "\n"
+      i += 1
+    print(str(key))
+    print("Decrypted message:")
+    for i in range(len(my_Message)):
+      for j in range(len(my_key)):
+        for k in range(len(my_key[0])):
+          result += my_Message[i][k] * my_key[k][j]
+        result = int(round(result))
+        string += chr(result)
+        result = 0
+    print(string[:-2])
+main()
+
